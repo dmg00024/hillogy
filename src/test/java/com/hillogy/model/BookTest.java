@@ -1,44 +1,49 @@
 package com.hillogy.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
 
-class BookTest {
+public class BookTest {
 
-	@Test
-	void testBook() {
-		fail("Not yet implemented");
+	private Book book;
+
+	@Before
+	public void setUp() {
+		book = new Book("Title", "Author", "ISBN", true);
 	}
 
 	@Test
-	void testGetTitle() {
-		fail("Not yet implemented");
+	public void testGetTitle() {
+		assertEquals("Title", book.getTitle());
 	}
 
 	@Test
-	void testGetAuthor() {
-		fail("Not yet implemented");
+	public void testGetAuthor() {
+		assertEquals("Author", book.getAuthor());
 	}
 
 	@Test
-	void testGetIsbn() {
-		fail("Not yet implemented");
+	public void testGetIsbn() {
+		assertEquals("ISBN", book.getIsbn());
 	}
 
 	@Test
-	void testIsAvailable() {
-		fail("Not yet implemented");
+	public void testIsAvailable() {
+		assertTrue(book.isAvailable());
 	}
 
 	@Test
-	void testSetAvailable() {
-		fail("Not yet implemented");
+	public void testSetAvailable() {
+		book.setAvailable(false);
+		assertFalse(book.isAvailable());
 	}
 
 	@Test
-	void testToString() {
-		fail("Not yet implemented");
+	public void testToString() {
+		String expected = "Book{title='Title', author='Author', isbn='ISBN', isAvailable=true}";
+		assertEquals(expected, book.toString());
 	}
-
 }
