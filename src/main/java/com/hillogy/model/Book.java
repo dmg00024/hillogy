@@ -1,25 +1,32 @@
 package com.hillogy.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+
+@Entity
 public class Book {
 
-	private String title;
-	private String author;
-	private String isbn;
-	private boolean isAvailable;
+	@Id
+    private String isbn;
 
-	/**
-	 * 
-	 * @param title
-	 * @param author
-	 * @param isbn
-	 * @param isAvailable
-	 */
-	public Book(String title, String author, String isbn, boolean isAvailable) {
-		this.title = title;
-		this.author = author;
-		this.isbn = isbn;
-		this.isAvailable = isAvailable;
-	}
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String author;
+
+    @Column(nullable = false)
+    private boolean isAvailable;
+
+    public Book(String title, String author, String isbn, boolean isAvailable) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.isAvailable = isAvailable;
+    }
+    
+    public Book() {}
 
 	/**
 	 * 
