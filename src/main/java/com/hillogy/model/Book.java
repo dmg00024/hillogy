@@ -38,6 +38,22 @@ public class Book {
 
 	/**
 	 * 
+	 * @param title
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * 
+	 * @param author
+	 */
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
 	public String getAuthor() {
@@ -50,6 +66,15 @@ public class Book {
 	 */
 	public String getIsbn() {
 		return isbn;
+	}
+	
+	/**
+	 * Sets the ISBN of the book.
+	 *
+	 * @param isbn the ISBN to set
+	 */
+	public void setIsbn(String isbn) {
+	    this.isbn = isbn;
 	}
 
 	/**
@@ -76,4 +101,5 @@ public class Book {
 		return "Book{" + "title='" + title + '\'' + ", author='" + author + '\'' + ", isbn='" + isbn + '\''
 				+ ", isAvailable=" + isAvailable + '}';
 	}
+
 }
