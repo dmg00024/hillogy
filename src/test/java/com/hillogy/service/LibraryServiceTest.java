@@ -17,8 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.hillogy.exceptions.BookAlreadyExistsException;
-import com.hillogy.exceptions.NoBooksFoundException;
+import com.hillogy.exception.BookAlreadyExistsException;
+import com.hillogy.exception.NoBooksFoundException;
 import com.hillogy.model.Book;
 import com.hillogy.repository.BookRepository;
 

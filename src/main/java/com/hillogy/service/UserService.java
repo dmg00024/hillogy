@@ -3,10 +3,10 @@ package com.hillogy.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hillogy.exceptions.NoBooksFoundException;
-import com.hillogy.exceptions.NoUserFoundException;
-import com.hillogy.exceptions.UnableToCheckOutBookException;
-import com.hillogy.exceptions.UnableToReturnBookException;
+import com.hillogy.exception.NoBooksFoundException;
+import com.hillogy.exception.NoUserFoundException;
+import com.hillogy.exception.UnableToCheckOutBookException;
+import com.hillogy.exception.UnableToReturnBookException;
 import com.hillogy.model.Book;
 import com.hillogy.model.User;
 import com.hillogy.repository.BookRepository;

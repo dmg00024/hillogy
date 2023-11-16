@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class User {
@@ -14,6 +15,8 @@ public class User {
 	private String username;
 	@Column(nullable = false)
 	private String password;
+	
+	@OneToMany
 	private List<Book> books;
 
 	/**

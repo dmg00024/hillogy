@@ -16,10 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.hillogy.exceptions.NoBooksFoundException;
-import com.hillogy.exceptions.NoUserFoundException;
-import com.hillogy.exceptions.UnableToCheckOutBookException;
-import com.hillogy.exceptions.UnableToReturnBookException;
+import com.hillogy.exception.NoBooksFoundException;
+import com.hillogy.exception.NoUserFoundException;
+import com.hillogy.exception.UnableToCheckOutBookException;
+import com.hillogy.exception.UnableToReturnBookException;
 import com.hillogy.model.Book;
 import com.hillogy.model.User;
 import com.hillogy.repository.BookRepository;

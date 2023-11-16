@@ -1,4 +1,4 @@
-package com.hillogy.exceptions;
+package com.hillogy.exception;
 
 public class NoUserFoundException extends RuntimeException {
 

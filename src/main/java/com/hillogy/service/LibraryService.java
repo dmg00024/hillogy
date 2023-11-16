@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hillogy.exceptions.BookAlreadyExistsException;
-import com.hillogy.exceptions.NoBooksFoundException;
+import com.hillogy.exception.BookAlreadyExistsException;
+import com.hillogy.exception.NoBooksFoundException;
 import com.hillogy.model.Book;
 import com.hillogy.repository.BookRepository;
 
