@@ -16,8 +16,19 @@ public class User {
      * 
      */
     public User() {}
-
+    
     /**
+     * 
+     * @param username
+     * @param password
+     */
+    public User(String username, String password) {
+		super();
+		this.username = username;
+		this.password = password;
+	}
+
+	/**
      * 
      * @return
      */
