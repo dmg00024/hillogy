@@ -1,53 +1,74 @@
 package com.hillogy.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hillogy.exceptions.NoBooksFoundException;
+import com.hillogy.exceptions.NoUserFoundException;
+import com.hillogy.exceptions.UnableToCheckOutBookException;
+import com.hillogy.exceptions.UnableToReturnBookException;
 import com.hillogy.model.Book;
+import com.hillogy.model.User;
 import com.hillogy.repository.BookRepository;
+import com.hillogy.repository.UserRepository;
 
 @Service
 public class UserService {
 
 	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
 	private BookRepository bookRepository;
 
 	/**
-	 * Checks out a book from the library.
+	 * Checks out a book for a user.
 	 *
-	 * @param isbn the ISBN of the book to check out
-	 * @throws NoBooksFoundException if a book with the given ISBN does not exist
-	 * @throws NoBooksFoundException if the book is not available
+	 * @param username the username of the user
+	 * @param isbn the ISBN of the book
+	 * @return true if the book was successfully checked out, false otherwise
+	 * @throws NoUserFoundException if the user is not found
+	 * @throws NoBooksFoundException if the book is not found
+	 * @throws UnableToCheckOutBookException if the book cannot be checked out
 	 */
-	public void checkOutBook(String isbn) {
-		Optional<Book> book = bookRepository.findById(isbn);
-		if (!book.isPresent()) {
-			throw new NoBooksFoundException("Book with ISBN " + isbn + " not found");
+	public boolean checkOutBook(String username, String isbn) {
+		try {
+			User user = userRepository.findById(username).orElseThrow(() -> new NoUserFoundException("User not found"));
+			Book book = bookRepository.findById(isbn).orElseThrow(() -> new NoBooksFoundException("Book not found"));
+
+			user.getBooks().add(book);
+
+			userRepository.save(user);
+
+			return true;
+		} catch (NoUserFoundException e) {
+			throw new UnableToCheckOutBookException(e.getMessage());
+		} catch (NoBooksFoundException e) {
+			throw new UnableToCheckOutBookException(e.getMessage());
 		}
-		if (!book.get().isAvailable()) {
-			throw new NoBooksFoundException("Book with ISBN " + isbn + " is not available");
-		}
-		book.get().setAvailable(false);
-		bookRepository.save(book.get());
 	}
 
 	/**
-	 * Returns a book to the library.
+	 * Returns a book from a user.
 	 *
-	 * @param isbn the ISBN of the book to return
-	 * @throws NoBooksFoundException if a book with the given ISBN does not exist in
-	 *                               the repository
+	 * @param username the username of the user who is returning the book
+	 * @param isbn     the ISBN of the book to be returned
+	 * @return true if the book was successfully returned
+	 * @throws NoUserFoundException        if no user is found with the given
+	 *                                     username
+	 * @throws NoBooksFoundException       if no book is found with the given ISBN
+	 * @throws UnableToReturnBookException if the user does not have the book
 	 */
-	public void returnBook(String isbn) {
-		Optional<Book> book = bookRepository.findById(isbn);
-		if (!book.isPresent()) {
-			throw new NoBooksFoundException("Book with ISBN " + isbn + " not found");
-		}
-		book.get().setAvailable(true);
-		bookRepository.save(book.get());
-	}
+	public boolean returnBook(String username, String isbn) throws UnableToReturnBookException {
+		User user = userRepository.findById(username).orElseThrow(() -> new NoUserFoundException("User not found"));
+		Book book = bookRepository.findById(isbn).orElseThrow(() -> new NoBooksFoundException("Book not found"));
 
+		if (user.getBooks().contains(book)) {
+			book.setAvailable(true);
+			user.getBooks().remove(book);
+			return true;
+		} else {
+			throw new UnableToReturnBookException("Unable to return book: User does not have this book");
+		}
+	}
 }

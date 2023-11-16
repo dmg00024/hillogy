@@ -1,6 +1,6 @@
 package com.hillogy.exceptions;
 
-public class UnableToReturnBookException extends Exception {
+public class UnableToReturnBookException extends RuntimeException {
 
 	/**
 	 * 

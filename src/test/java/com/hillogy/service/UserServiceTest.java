@@ -1,6 +1,12 @@
 package com.hillogy.service;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
@@ -8,75 +14,96 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.hillogy.exceptions.NoBooksFoundException;
+import com.hillogy.exceptions.NoUserFoundException;
+import com.hillogy.exceptions.UnableToCheckOutBookException;
+import com.hillogy.exceptions.UnableToReturnBookException;
 import com.hillogy.model.Book;
+import com.hillogy.model.User;
 import com.hillogy.repository.BookRepository;
+import com.hillogy.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
     @Mock
-    private BookRepository bookRepository;
+    UserRepository userRepository;
+
+    @Mock
+    BookRepository bookRepository;
 
     @InjectMocks
-    private UserService userService;
-
-    @Test
-    public void testCheckOutBookWhenBookNotFound() {
-        // Arrange
-        Mockito.when(bookRepository.findById("123")).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(NoBooksFoundException.class, () -> userService.checkOutBook("123"));
-    }
-
-    @Test
-    public void testCheckOutBookWhenBookNotAvailable() {
-        // Arrange
-        Book unavailableBook = new Book("456", "Unavailable Book", "ISBN", false);
-        Mockito.when(bookRepository.findById("456")).thenReturn(Optional.of(unavailableBook));
-
-        // Act & Assert
-        assertThrows(NoBooksFoundException.class, () -> userService.checkOutBook("456"));
-    }
+    UserService userService;
 
     @Test
     public void testCheckOutBookSuccess() {
-        // Arrange
-    	Book availableBook = new Book("789", "Available Book", "ISBN", true);
-        Mockito.when(bookRepository.findById("789")).thenReturn(Optional.of(availableBook));
+        User user = new User();
+        Book book = new Book();
 
-        // Act
-        userService.checkOutBook("789");
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(anyString())).thenReturn(Optional.of(book));
 
-        // Assert
-        Mockito.verify(bookRepository, Mockito.times(1)).save(availableBook);
-        assert !availableBook.isAvailable(); // Ensure the book is marked as unavailable
+        assertTrue(userService.checkOutBook("username", "isbn"));
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
-    public void testReturnBookWhenBookNotFound() {
-        // Arrange
-        Mockito.when(bookRepository.findById("123")).thenReturn(Optional.empty());
+    public void testCheckOutBookUserNotFound() {
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(NoBooksFoundException.class, () -> userService.returnBook("123"));
+        assertThrows(UnableToCheckOutBookException.class, () -> userService.checkOutBook("username", "isbn"));
     }
 
+    @Test
+    public void testCheckOutBookBookNotFound() {
+        User user = new User();
+
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(UnableToCheckOutBookException.class, () -> userService.checkOutBook("username", "isbn"));
+    }
+    
     @Test
     public void testReturnBookSuccess() {
-        // Arrange
-        Book checkedOutBook = new Book("789", "Checked Out Book", "ISBN", false);
-        Mockito.when(bookRepository.findById("789")).thenReturn(Optional.of(checkedOutBook));
+        User user = new User();
+        Book book = new Book();
+        user.getBooks().add(book);
 
-        // Act
-        userService.returnBook("789");
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(anyString())).thenReturn(Optional.of(book));
 
-        // Assert
-        Mockito.verify(bookRepository, Mockito.times(1)).save(checkedOutBook);
-        assert checkedOutBook.isAvailable(); // Ensure the book is marked as available
+        assertTrue(userService.returnBook("username", "isbn"));
+        assertFalse(user.getBooks().contains(book));
+    }
+
+    @Test
+    public void testReturnBookUserNotFound() {
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(NoUserFoundException.class, () -> userService.returnBook("username", "isbn"));
+    }
+
+    @Test
+    public void testReturnBookBookNotFound() {
+        User user = new User();
+
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(NoBooksFoundException.class, () -> userService.returnBook("username", "isbn"));
+    }
+
+    @Test
+    public void testReturnBookNotCheckedOut() {
+        User user = new User();
+        Book book = new Book();
+
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(bookRepository.findById(anyString())).thenReturn(Optional.of(book));
+
+        assertThrows(UnableToReturnBookException.class, () -> userService.returnBook("username", "isbn"));
     }
 }

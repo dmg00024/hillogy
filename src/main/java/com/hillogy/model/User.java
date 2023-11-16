@@ -1,5 +1,8 @@
 package com.hillogy.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,31 +10,35 @@ import jakarta.persistence.Id;
 @Entity
 public class User {
 
-    @Id
-    private String username;
-    @Column(nullable = false)
-    private String password;   
-    
-    /**
-     * 
-     */
-    public User() {}
-    
-    /**
-     * 
-     * @param username
-     * @param password
-     */
-    public User(String username, String password) {
-		super();
-		this.username = username;
-		this.password = password;
+	@Id
+	private String username;
+	@Column(nullable = false)
+	private String password;
+	private List<Book> books;
+
+	/**
+	 * 
+	 */
+	public User() {
+		this.books = new ArrayList<>();
 	}
 
 	/**
-     * 
-     * @return
-     */
+	 * 
+	 * @param username
+	 * @param password
+	 */
+	public User(String username, String password) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.books = new ArrayList<>();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public String getUsername() {
 		return username;
 	}
@@ -58,5 +65,21 @@ public class User {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	/**
+	 * 
+	 * @param books
+	 */
+	public void setBooks(List<Book> books) {
+		this.books = books;
 	}
 }

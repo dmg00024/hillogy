@@ -3,6 +3,9 @@ package com.hillogy.model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserTest {
 
     // Step 1: Create an instance of User
@@ -40,5 +43,25 @@ public class UserTest {
     public void testSetPassword() {
         user.setPassword("NewPassword");
         assertEquals("NewPassword", user.getPassword());
+    }
+    
+    @Test
+    public void testGetBooks() {
+        User user = new User();
+        List<Book> books = new ArrayList<>();
+        books.add(new Book());
+        user.setBooks(books);
+
+        assertEquals(books, user.getBooks());
+    }
+
+    @Test
+    public void testSetBooks() {
+        User user = new User();
+        List<Book> books = new ArrayList<>();
+        books.add(new Book());
+        user.setBooks(books);
+
+        assertEquals(books, user.getBooks());
     }
 }
