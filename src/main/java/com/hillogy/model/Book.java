@@ -17,13 +17,13 @@ public class Book {
     private String author;
 
     @Column(nullable = false)
-    private boolean isAvailable;
+    private boolean available;
 
-    public Book(String title, String author, String isbn, boolean isAvailable) {
+    public Book(String title, String author, String isbn, boolean available) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
-        this.isAvailable = isAvailable;
+        this.available = available;
     }
     
     public Book() {}
@@ -82,7 +82,7 @@ public class Book {
 	 * @return
 	 */
 	public boolean isAvailable() {
-		return isAvailable;
+		return available;
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class Book {
 	 * @param available
 	 */
 	public void setAvailable(boolean available) {
-		isAvailable = available;
+		this.available = available;
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Book {
 	@Override
 	public String toString() {
 		return "Book{" + "title='" + title + '\'' + ", author='" + author + '\'' + ", isbn='" + isbn + '\''
-				+ ", isAvailable=" + isAvailable + '}';
+				+ ", isAvailable=" + this.available + '}';
 	}
 
 }

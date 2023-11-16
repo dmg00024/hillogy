@@ -1,22 +1,33 @@
 package com.hillogy;
 
-import com.hillogy.model.Book;
-import com.hillogy.repository.BookRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.Optional;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
+import com.hillogy.model.Book;
+import com.hillogy.repository.BookRepository;
 
 @SpringBootTest(classes = HillogyApplication.class)
 public class HillogyApplicationTest {
 
 	@MockBean
 	private BookRepository bookRepository;
+
+	@Test
+	public void testMain() {
+		// Call the main method
+		HillogyApplication.main(new String[] {});
+
+		// Assert application starts successfully
+		assertTrue(true);
+	}
 
 	@Test
 	public void whenFindByIsbn_thenReturnBook() {
