@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.hillogy.exception.BookAlreadyExistsException;
 import com.hillogy.exception.NoBooksFoundException;
+import com.hillogy.exception.UnableToRemoveBookException;
 import com.hillogy.model.Book;
 import com.hillogy.repository.BookRepository;
 
@@ -39,10 +40,13 @@ public class LibraryService {
 	 *                               the repository
 	 */
 	public void removeBook(String isbn) {
-		if (!bookRepository.existsById(isbn)) {
-			throw new NoBooksFoundException("Book with ISBN " + isbn + " not found");
-		}
-		bookRepository.deleteById(isbn);
+		Book book = bookRepository.findById(isbn).orElseThrow(() -> new NoBooksFoundException("Book not found"));
+
+	    if (book.isAvailable()) {
+	        bookRepository.deleteById(isbn);
+	    } else {
+	        throw new UnableToRemoveBookException("Book is not available");
+	    }
 	}
 
 	/**

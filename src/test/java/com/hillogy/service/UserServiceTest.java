@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.hillogy.exception.NoBooksFoundException;
 import com.hillogy.exception.NoUserFoundException;
 import com.hillogy.exception.UnableToCheckOutBookException;
+import com.hillogy.exception.UnableToRemoveBookException;
 import com.hillogy.exception.UnableToReturnBookException;
 import com.hillogy.model.Book;
 import com.hillogy.model.User;
