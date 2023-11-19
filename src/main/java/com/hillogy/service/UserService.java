@@ -3,10 +3,13 @@ package com.hillogy.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hillogy.converter.UserConverter;
+import com.hillogy.dto.UserDTO;
 import com.hillogy.exception.NoBooksFoundException;
 import com.hillogy.exception.NoUserFoundException;
 import com.hillogy.exception.UnableToCheckOutBookException;
 import com.hillogy.exception.UnableToReturnBookException;
+import com.hillogy.exception.UserAlreadyExistsException;
 import com.hillogy.model.Book;
 import com.hillogy.model.User;
 import com.hillogy.repository.BookRepository;
@@ -71,4 +74,21 @@ public class UserService {
 			throw new UnableToReturnBookException("Unable to return book: User does not have this book");
 		}
 	}
+	
+	/**
+     * Adds a new user.
+     *
+     * @param dto the UserDTO containing the data of the new user.
+     * @return the added User.
+     * @throws UserAlreadyExistsException if a user with the same username already exists.
+     */
+    public User addUser(UserDTO dto) throws UserAlreadyExistsException {
+        User user = UserConverter.toEntity(dto);
+
+        if (userRepository.existsById(user.getUsername())) {
+            throw new UserAlreadyExistsException("A user with this username already exists.");
+        }
+
+        return userRepository.save(user);
+    }
 }
