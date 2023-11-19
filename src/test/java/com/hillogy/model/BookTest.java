@@ -36,12 +36,19 @@ public class BookTest {
     }
 
     @Test
-    public void testToString() {
-        // Create an instance of Book
-        Book book = new Book("Test Title", "Test Author", "1234567890", true);
+    void toStringTest() {
+        // Arrange
+        Book book = new Book();
+        book.setTitle("Title");
+        book.setAuthor("Author");
+        book.setIsbn("123");
+        book.setAvailable(true);
 
-        // Test toString
-        String expected = "Book{title='Test Title', author='Test Author', isbn='1234567890', isAvailable=true}";
-        assertEquals(expected, book.toString());
+        // Act
+        String result = book.toString();
+
+        // Assert
+        String expected = "Book{title='Title', author='Author', isbn='123', isAvailable=true}";
+        assertEquals(expected, result);
     }
 }

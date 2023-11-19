@@ -1,14 +1,16 @@
 package com.hillogy.service;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.hillogy.converter.BookConverter;
+import com.hillogy.dto.BookDTO;
 import com.hillogy.exception.BookAlreadyExistsException;
 import com.hillogy.exception.NoBooksFoundException;
 import com.hillogy.exception.UnableToRemoveBookException;
@@ -34,130 +38,229 @@ public class LibraryServiceTest {
 	private BookRepository bookRepository;
 
 	@Test
-	public void testAddBook() {
-		Book book = new Book();
-		book.setIsbn("123");
-		when(bookRepository.existsById("123")).thenReturn(false);
-		when(bookRepository.save(book)).thenReturn(book);
+	public void testAddBookSuccessfully() {
+		BookDTO dto = new BookDTO("123", "Title", "Author", true);
+		Book book = BookConverter.toEntity(dto);
 
-		libraryService.addBook(book);
+		when(bookRepository.existsById(book.getIsbn())).thenReturn(false);
+		when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-		verify(bookRepository, times(1)).save(book);
+		boolean result = libraryService.addBook(dto);
+
+		assertTrue(result);
+		verify(bookRepository, times(1)).save(any(Book.class));
 	}
 
 	@Test
-	public void testAddBookAlreadyExists() {
-		Book book = new Book();
-		book.setIsbn("123");
-		when(bookRepository.existsById("123")).thenReturn(true);
+	public void testAddBookThrowsBookAlreadyExistsException() {
+		BookDTO dto = new BookDTO("123", "Title", "Author", true);
+		Book book = BookConverter.toEntity(dto);
 
-		assertThrows(BookAlreadyExistsException.class, () -> libraryService.addBook(book));
+		when(bookRepository.existsById(book.getIsbn())).thenReturn(true);
+
+		assertThrows(BookAlreadyExistsException.class, () -> libraryService.addBook(dto));
 	}
 
 	@Test
-	public void testRemoveBookSuccess() {
-		Book book = new Book();
-		book.setAvailable(true);
+	public void testAddBookReturnsFalseWhenSavedBookIsNull() {
+		BookDTO dto = new BookDTO("123", "Title", "Author", true);
 
-		when(bookRepository.findById(anyString())).thenReturn(Optional.of(book));
+		when(bookRepository.existsById(dto.getIsbn())).thenReturn(false);
+		when(bookRepository.save(any(Book.class))).thenReturn(null);
 
-		libraryService.removeBook("isbn");
+		boolean result = libraryService.addBook(dto);
 
-		verify(bookRepository, times(1)).deleteById("isbn");
+		assertFalse(result);
 	}
 
 	@Test
-    public void testRemoveBookBookNotFound() {
-        when(bookRepository.findById(anyString())).thenReturn(Optional.empty());
+	public void testAddBookReturnsFalseWhenSavedBookISBNDoesNotMatch() {
+		BookDTO dto = new BookDTO("123", "Title", "Author", true);
+		Book book = new Book("456", "Title", "Author", true);
 
-        assertThrows(NoBooksFoundException.class, () -> libraryService.removeBook("isbn"));
-    }
+		when(bookRepository.existsById(dto.getIsbn())).thenReturn(false);
+		when(bookRepository.save(any(Book.class))).thenReturn(book);
 
+		boolean result = libraryService.addBook(dto);
+
+		assertFalse(result);
+	}
+	
 	@Test
-	public void testRemoveBookNotAvailable() {
-		Book book = new Book();
-		book.setAvailable(false);
+	public void testRemoveBookSuccessfully() {
+	    String isbn = "123";
+	    Book book = new Book(isbn, "Title", "Author", true);
 
-		when(bookRepository.findById(anyString())).thenReturn(Optional.of(book));
+	    when(bookRepository.findById(isbn)).thenReturn(Optional.of(book));
+	    when(bookRepository.existsById(isbn)).thenReturn(false);
 
-		assertThrows(UnableToRemoveBookException.class, () -> libraryService.removeBook("isbn"));
+	    boolean result = libraryService.removeBook(isbn);
+
+	    assertTrue(result);
+	    verify(bookRepository, times(1)).deleteById(isbn);
 	}
 
 	@Test
-	public void testGetBookByTitle() {
-		Book book = new Book();
-		book.setTitle("Test Title");
-		when(bookRepository.findByTitle("Test Title")).thenReturn(book);
+	public void testRemoveBookThrowsNoBooksFoundException() {
+	    String isbn = "123";
 
-		Book returnedBook = libraryService.getBookByTitle("Test Title");
+	    when(bookRepository.findById(isbn)).thenReturn(Optional.empty());
 
-		assertEquals(book, returnedBook);
+	    assertThrows(NoBooksFoundException.class, () -> libraryService.removeBook(isbn));
 	}
 
 	@Test
-    public void testGetBookByTitleNotFound() {
-        when(bookRepository.findByTitle("Test Title")).thenReturn(null);
+	public void testRemoveBookThrowsUnableToRemoveBookException() {
+	    String isbn = "123";
+	    Book book = new Book(isbn, "Title", "Author", false);
 
-        assertThrows(NoBooksFoundException.class, () -> libraryService.getBookByTitle("Test Title"));
-    }
+	    when(bookRepository.findById(isbn)).thenReturn(Optional.of(book));
 
-	@Test
-	public void testGetBookByAuthor() {
-		Book book1 = new Book();
-		book1.setAuthor("Test Author");
-		Book book2 = new Book();
-		book2.setAuthor("Test Author");
-		List<Book> books = Arrays.asList(book1, book2);
-		when(bookRepository.findByAuthor("Test Author")).thenReturn(books);
-
-		List<Book> returnedBooks = libraryService.getBookByAuthor("Test Author");
-
-		assertEquals(books, returnedBooks);
+	    assertThrows(UnableToRemoveBookException.class, () -> libraryService.removeBook(isbn));
 	}
 
 	@Test
-    public void testGetBookByAuthorNotFound() {
-        when(bookRepository.findByAuthor("Test Author")).thenReturn(Collections.emptyList());
+	public void testRemoveBookReturnsFalseWhenBookStillExistsAfterDeletion() {
+	    String isbn = "123";
+	    Book book = new Book(isbn, "Title", "Author", true);
 
-        assertThrows(NoBooksFoundException.class, () -> libraryService.getBookByAuthor("Test Author"));
-    }
+	    when(bookRepository.findById(isbn)).thenReturn(Optional.of(book));
+	    when(bookRepository.existsById(isbn)).thenReturn(true);
 
+	    boolean result = libraryService.removeBook(isbn);
+
+	    assertFalse(result);
+	}	
+	
 	@Test
-	public void testGetBookByIsbn() {
-		Book book = new Book();
-		book.setIsbn("123");
-		when(bookRepository.findById("123")).thenReturn(Optional.of(book));
+	void getBookByTitleTest() {
+	    // Arrange
+	    Book book = new Book();
+	    book.setTitle("some title");
+	    when(bookRepository.findByTitle("some title")).thenReturn(book);
 
-		Book returnedBook = libraryService.getBookByIsbn("123");
+	    // Act
+	    BookDTO result = libraryService.getBookByTitle("some title");
 
-		assertEquals(book, returnedBook);
+	    // Assert
+	    assertNotNull(result);
+	    assertEquals("some title", result.getTitle());
 	}
 
 	@Test
-    public void testGetBookByIsbnNotFound() {
-        when(bookRepository.findById("123")).thenReturn(Optional.empty());
+	void getBookByTitleTest_ThrowsNoBooksFoundException() {
+	    // Arrange
+	    when(bookRepository.findByTitle("some title")).thenReturn(null);
 
-        assertThrows(NoBooksFoundException.class, () -> libraryService.getBookByIsbn("123"));
-    }
+	    // Act and Assert
+	    Exception exception = assertThrows(NoBooksFoundException.class, () -> {
+	        libraryService.getBookByTitle("some title");
+	    });
 
+	    String expectedMessage = "Book with title some title not found";
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
+	}
+	
 	@Test
-	public void testGetAvailableBooks() {
-		Book book1 = new Book();
-		book1.setAvailable(true);
-		Book book2 = new Book();
-		book2.setAvailable(true);
-		List<Book> books = Arrays.asList(book1, book2);
-		when(bookRepository.findByAvailable(true)).thenReturn(books);
+	void getBooksByAuthorTest() {
+	    // Arrange
+	    List<Book> books = new ArrayList<>();
+	    Book book = new Book();
+	    book.setAuthor("some author");
+	    books.add(book);
+	    when(bookRepository.findByAuthor("some author")).thenReturn(books);
 
-		List<Book> returnedBooks = libraryService.getAvailableBooks();
+	    // Act
+	    List<BookDTO> result = libraryService.getBooksByAuthor("some author");
 
-		assertEquals(books, returnedBooks);
+	    // Assert
+	    assertNotNull(result);
+	    assertEquals(1, result.size());
+	    assertEquals("some author", result.get(0).getAuthor());
 	}
 
 	@Test
-    public void testGetAvailableBooksNotFound() {
-        when(bookRepository.findByAvailable(true)).thenReturn(Collections.emptyList());
+	void getBooksByAuthorTest_ThrowsNoBooksFoundException() {
+	    // Arrange
+	    when(bookRepository.findByAuthor("some author")).thenReturn(new ArrayList<>());
 
-        assertThrows(NoBooksFoundException.class, () -> libraryService.getAvailableBooks());
-    }
+	    // Act and Assert
+	    Exception exception = assertThrows(NoBooksFoundException.class, () -> {
+	        libraryService.getBooksByAuthor("some author");
+	    });
+
+	    String expectedMessage = "No books found by author some author";
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
+	}
+	
+	@Test
+	void getBookByIsbnTest() {
+	    // Arrange
+	    Book book = new Book();
+	    book.setIsbn("some isbn");
+	    when(bookRepository.findById("some isbn")).thenReturn(Optional.of(book));
+
+	    // Act
+	    BookDTO result = libraryService.getBookByIsbn("some isbn");
+
+	    // Assert
+	    assertNotNull(result);
+	    assertEquals("some isbn", result.getIsbn());
+	}
+
+	@Test
+	void getBookByIsbnTest_ThrowsNoBooksFoundException() {
+	    // Arrange
+	    when(bookRepository.findById("some isbn")).thenReturn(Optional.empty());
+
+	    // Act and Assert
+	    Exception exception = assertThrows(NoBooksFoundException.class, () -> {
+	        libraryService.getBookByIsbn("some isbn");
+	    });
+
+	    String expectedMessage = "Book with isbn some isbn not found";
+	    String actualMessage = exception.getMessage();
+
+	    assertFalse(actualMessage.contains(expectedMessage));
+	}
+	
+	@Test
+	void getAvailableBooksTest() {
+	    // Arrange
+	    List<Book> books = new ArrayList<>();
+	    Book book = new Book();
+	    book.setIsbn("some isbn");
+	    book.setAvailable(true);
+	    books.add(book);
+	    when(bookRepository.findByAvailable(true)).thenReturn(books);
+
+	    // Act
+	    List<BookDTO> result = libraryService.getAvailableBooks();
+
+	    // Assert
+	    assertNotNull(result);
+	    assertEquals(1, result.size());
+	    assertEquals("some isbn", result.get(0).getIsbn());
+	    assertTrue(result.get(0).isAvailable());
+	}
+
+	@Test
+	void getAvailableBooksTest_ThrowsNoBooksFoundException() {
+	    // Arrange
+	    when(bookRepository.findByAvailable(true)).thenReturn(new ArrayList<>());
+
+	    // Act and Assert
+	    Exception exception = assertThrows(NoBooksFoundException.class, () -> {
+	        libraryService.getAvailableBooks();
+	    });
+
+	    String expectedMessage = "No available books found";
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
+	}
 }
