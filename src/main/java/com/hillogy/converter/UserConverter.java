@@ -1,4 +1,4 @@
-package com.hillogy.controller;
+package com.hillogy.converter;
 
 import com.hillogy.dto.UserDTO;
 import com.hillogy.model.User;
