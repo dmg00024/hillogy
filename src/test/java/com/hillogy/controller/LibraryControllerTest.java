@@ -1,7 +1,5 @@
 package com.hillogy.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -217,6 +215,7 @@ public class LibraryControllerTest {
         ResponseEntity<List<BookDTO>> response = libraryController.getAvailableBooks();
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody() == null || response.getBody().isEmpty());
+        List<BookDTO> body = response.getBody();
+		assertTrue(body == null || body.isEmpty());
     }
 }
