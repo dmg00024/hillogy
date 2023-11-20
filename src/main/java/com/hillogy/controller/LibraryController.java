@@ -18,12 +18,18 @@ import com.hillogy.exception.BookAlreadyExistsException;
 import com.hillogy.exception.NoBooksFoundException;
 import com.hillogy.service.LibraryService;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@OpenAPIDefinition(info = @Info(title = "Hillogy test API", version = "v1", description = "Author: Daniel Muñoz GAllardo", license = @License(name = " Test for hillogy © 2023 by Daniel Muñoz Gallardo is licensed under CC BY-NC-ND 4.0 ", url = "https://creativecommons.org/licenses/by/4.0/"
+
+)))
 @Tag(name = "Library Controller", description = "Library Management endpoints")
 @RestController
 @RequestMapping("/library")
@@ -33,36 +39,34 @@ public class LibraryController {
 	public LibraryService libraryService;
 
 	/**
-     * Adds a new book to the library.
-     *
-     * @param dto the BookDTO containing the data of the new book.
-     * @return ResponseEntity with status CREATED if the book was added
-     *         successfully, CONFLICT if a book with the same ISBN already exists,
-     *         INTERNAL_SERVER_ERROR for any other exceptions.
-     */
-    @Operation(summary = "Add a new book")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Book added", 
-                     content = {@Content(mediaType = "application/json")}),
-        @ApiResponse(responseCode = "409", description = "Book already exists", 
-                     content = @Content),
-        @ApiResponse(responseCode = "500", description = "Server error", 
-                     content = @Content) })
-    @PostMapping("/books")
-    public ResponseEntity<?> addBook(@RequestBody BookDTO dto) {
-        try {
-            boolean isAdded = libraryService.addBook(dto);
-            if (isAdded) {
-            	return ResponseEntity.created(null).build();
-            } else {
-                return ResponseEntity.internalServerError().build();
-            }
-        } catch (BookAlreadyExistsException e) {
-            return ResponseEntity.status(409).build();
-        } catch (Exception e) {
-        	return ResponseEntity.internalServerError().build();
-        }
-    }
+	 * Adds a new book to the library.
+	 *
+	 * @param dto the BookDTO containing the data of the new book.
+	 * @return ResponseEntity with status CREATED if the book was added
+	 *         successfully, CONFLICT if a book with the same ISBN already exists,
+	 *         INTERNAL_SERVER_ERROR for any other exceptions.
+	 */
+	@Operation(summary = "Add a new book")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Book added", content = {
+					@Content(mediaType = "application/json") }),
+			@ApiResponse(responseCode = "409", description = "Book already exists", content = @Content),
+			@ApiResponse(responseCode = "500", description = "Server error", content = @Content) })
+	@PostMapping("/books")
+	public ResponseEntity<?> addBook(@RequestBody BookDTO dto) {
+		try {
+			boolean isAdded = libraryService.addBook(dto);
+			if (isAdded) {
+				return ResponseEntity.created(null).build();
+			} else {
+				return ResponseEntity.internalServerError().build();
+			}
+		} catch (BookAlreadyExistsException e) {
+			return ResponseEntity.status(409).build();
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().build();
+		}
+	}
 
 	/**
 	 * Removes a book from the library.

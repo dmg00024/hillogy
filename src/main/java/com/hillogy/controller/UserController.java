@@ -10,10 +10,16 @@ import com.hillogy.exception.UserAlreadyExistsException;
 import com.hillogy.model.User;
 import com.hillogy.service.UserService;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@OpenAPIDefinition(info = @Info(title = "Hillogy test API", version = "v1", description = "Author: Daniel Muñoz GAllardo", license = @License(name = " Test for hillogy © 2023 by Daniel Muñoz Gallardo is licensed under CC BY-NC-ND 4.0 ", url = "https://creativecommons.org/licenses/by/4.0/"
+
+)))
 @Tag(name = "User Controller", description = "Endpoints for managing users")
 @RestController
 @RequestMapping("/users")
