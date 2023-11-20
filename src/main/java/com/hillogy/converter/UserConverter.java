@@ -16,15 +16,5 @@ public class UserConverter {
 		return user;
 	}
 	
-	/**
-	 * Converts a User entity to a UserDTO object.
-	 *
-	 * @param user the User entity to be converted
-	 * @return a UserDTO object with the username from the User entity
-	 */
-	public static UserDTO toDto(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setUsername(user.getUsername());
-        return dto;
-    }
+	
 }
